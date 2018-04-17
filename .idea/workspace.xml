@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b22c8522-2883-4835-aa06-61952305b5fc" name="Default" comment="Modify parser to support index types (Task 1)">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/kotlinc.xml" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/bin/ChangeMajor.class" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/bin/CreateStudentDB.class" afterPath="" />
@@ -136,8 +135,6 @@
       <change type="DELETED" beforePath="$PROJECT_DIR$/bin/simpledb/tx/recovery/SetIntRecord.class" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/bin/simpledb/tx/recovery/SetStringRecord.class" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/bin/simpledb/tx/recovery/StartRecord.class" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/simpledb/index/hash/ExtensibleHashIndex.java" afterPath="$PROJECT_DIR$/src/simpledb/index/hash/ExtensibleHashIndex.java" />
     </list>
     <ignored path="$PROJECT_DIR$/bin/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -190,10 +187,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ExtensibleHashIndex.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="ExtensibleHashIndex.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/simpledb/index/hash/ExtensibleHashIndex.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1276">
+            <state relative-caret-position="-1624">
               <caret line="25" column="27" lean-forward="false" selection-start-line="25" selection-start-column="27" selection-end-line="25" selection-end-column="27" />
               <folding />
             </state>
@@ -237,7 +234,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="87">
@@ -253,6 +250,7 @@
     <findStrings>
       <find>createIndex</find>
       <find>blocksAcc</find>
+      <find>bin</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -980,7 +978,7 @@
       <option name="presentableId" value="Default" />
       <updated>1523973608914</updated>
       <workItem from="1523973612711" duration="2085000" />
-      <workItem from="1523992074945" duration="1993000" />
+      <workItem from="1523992074945" duration="2041000" />
     </task>
     <task id="LOCAL-00001" summary="Modify parser to support index types (Task 1)">
       <created>1523975559828</created>
@@ -989,15 +987,21 @@
       <option name="project" value="LOCAL" />
       <updated>1523975559828</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Begin work on extensiblehash">
+      <created>1523994121361</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1523994121361</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="4078000" />
+    <option name="totallyTimeSpent" value="4126000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-12" y="-12" width="2760" height="1778" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -1037,7 +1041,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Modify parser to support index types (Task 1)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Modify parser to support index types (Task 1)" />
+    <MESSAGE value="Begin work on extensiblehash" />
+    <option name="LAST_COMMIT_MESSAGE" value="Begin work on extensiblehash" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -1305,18 +1310,18 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/simpledb/index/hash/ExtensibleHashIndex.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1276">
-          <caret line="25" column="27" lean-forward="false" selection-start-line="25" selection-start-column="27" selection-end-line="25" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="87">
           <caret line="3" column="20" lean-forward="false" selection-start-line="3" selection-start-column="20" selection-end-line="3" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/simpledb/index/hash/ExtensibleHashIndex.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1624">
+          <caret line="25" column="27" lean-forward="false" selection-start-line="25" selection-start-column="27" selection-end-line="25" selection-end-column="27" />
           <folding />
         </state>
       </provider>
