@@ -143,7 +143,7 @@ public class ExtensibleHashIndex implements Index {
 
 		ts.beforeFirst();
 		while(ts.next()) {
-			ts.
+			
 		}
 	}
 
@@ -152,7 +152,7 @@ public class ExtensibleHashIndex implements Index {
 		TableScan newGlobalTable = new TableScan(new TableInfo(idxname+"globalnew", globalSchema()), tx);
 		newGlobalTable.beforeFirst();
 		newGlobalTable.setString("id", "global");
-		newGlobalTable.setInt("depth", globalDepth+1);
+		newGlobalTable.setInt("depth", ++globalDepth);
 
 		globalscan.beforeFirst();
 		globalscan.next();
@@ -172,7 +172,24 @@ public class ExtensibleHashIndex implements Index {
 			newGlobalTable.setInt("depth", depth);
 		}
 
-		
+		globalscan.beforeFirst();
+		newGlobalTable.beforeFirst();
+		while(newGlobalTable.next()) {
+			String id = newGlobalTable.getString("id");
+			String filename = newGlobalTable.getString("filename");
+			int depth = newGlobalTable.getInt("depth");
+			globalscan.insert();
+			globalscan.setString("id", id);
+			globalscan.setString("filename", filename);
+			globalscan.setInt("depth", depth);
+		}
+
+		while(newGlobalTable.next()) {
+			newGlobalTable.delete();
+		}
+		newGlobalTable.close();
+
+
 	}
 
 	/**
