@@ -15,12 +15,15 @@ import simpledb.tx.Transaction;
  * @author Edward Sciore
  */
 public class ExtensibleHashIndex implements Index {
-	public static int NUM_BUCKETS = 100;
+	public static int MAX_ITEMS_BUCKET = 5;
 	private String idxname;
 	private Schema sch;
 	private Transaction tx;
 	private Constant searchkey = null;
 	private TableScan ts = null;
+	private TableInfo globalTable;
+	private int globalDepth;
+	private int localDepth;
 
 	/**
 	 * Opens a hash index for the specified index.
@@ -32,6 +35,13 @@ public class ExtensibleHashIndex implements Index {
 		this.idxname = idxname;
 		this.sch = sch;
 		this.tx = tx;
+
+		globalDepth = 1;
+
+
+		String globalname = idxname + "global";
+		globalTable = new TableInfo(globalname, globalSchema());
+
 	}
 
 	/**
@@ -45,11 +55,25 @@ public class ExtensibleHashIndex implements Index {
 	 */
 	public void beforeFirst(Constant searchkey) {
 		close();
+		String binaryHashCode = Integer.toBinaryString(searchkey.hashCode());
+		String bucket = binaryHashCode.substring(binaryHashCode.length() - globalDepth);
+		String newBucket = binaryHashCode.substring(binaryHashCode.length() - 1);
+		String bucketFile = "exh" + idxname + newBucket;
+		// actually open the correct bucket for the given searchkey
+		TableScan tableScan = new TableScan(globalTable, tx);
+		int localDepth = 1;
+		tableScan.beforeFirst();
+		while(tableScan.next()) {
+			if (tableScan.getString("id").equals(bucket)) {
+				bucketFile = tableScan.getString("filename");
+				localDepth = tableScan.getInt("depth");
+				break;
+			}
+		}
 		this.searchkey = searchkey;
-		int bucket = searchkey.hashCode() % NUM_BUCKETS;
-		String tblname = idxname + bucket;
-		TableInfo ti = new TableInfo(tblname, sch);
+		TableInfo ti = new TableInfo(bucketFile, sch);
 		ts = new TableScan(ti, tx);
+
 	}
 
 	/**
@@ -114,17 +138,12 @@ public class ExtensibleHashIndex implements Index {
 			ts.close();
 	}
 
-	/**
-	 * Returns the cost of searching an index file having the
-	 * specified number of blocks.
-	 * The method assumes that all buckets are about the
-	 * same size, and so the cost is simply the size of
-	 * the bucket.
-	 * @param numblocks the number of blocks of index records
-	 * @param rpb the number of records per block (not used here)
-	 * @return the cost of traversing the index
-	 */
-	public static int searchCost(int numblocks, int rpb){
-		return numblocks / ExtensibleHashIndex.NUM_BUCKETS;
+
+	private Schema globalSchema() {
+		Schema sch = new Schema();
+		sch.addStringField("id", 20);
+		sch.addStringField("filename", 40);
+		sch.addIntField("depth");
+		return sch;
 	}
 }
