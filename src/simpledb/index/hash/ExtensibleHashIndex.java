@@ -8,6 +8,8 @@ import simpledb.record.Schema;
 import simpledb.record.TableInfo;
 import simpledb.tx.Transaction;
 
+import java.util.ArrayList;
+
 /**
  * A static hash implementation of the Index interface.
  * A fixed number of buckets is allocated (currently, 100),
@@ -83,6 +85,7 @@ public class ExtensibleHashIndex implements Index {
 		while(globalscan.next()) {
 			if (globalscan.getString("id").equals(bucketID)) {
 				bucketFile = globalscan.getString("filename");
+				localDepth = globalscan.getInt("depth");
 				break;
 			}
 		}
@@ -140,10 +143,46 @@ public class ExtensibleHashIndex implements Index {
 	}
 
 	private void increaseLocalDepth() {
-
+		ArrayList<BucketContents> oldContents = new ArrayList<>();
 		ts.beforeFirst();
 		while(ts.next()) {
-			
+			oldContents.add(new BucketContents(ts.getInt("block"), ts.getInt("id"), ts.getVal("dataval")));
+		}
+
+		if (localDepth + 1 <= globalDepth) {
+			// just increase the localDepth
+			globalscan = new TableScan(globalTable, tx);
+			globalscan.beforeFirst();
+			while(globalscan.next()) {
+				String binaryHashCode = Integer.toBinaryString(searchkey.hashCode());
+				String localBits = binaryHashCode.substring(binaryHashCode.length() - localDepth);
+				String globalid = globalscan.getString("id");
+				if (globalid.endsWith(localBits)) {
+					globalscan.setInt("depth", localDepth + 1);
+					String newGlobalBits = globalid.substring(globalid.length() - (localDepth + 1));
+					globalscan.setString("filename", "exh"+idxname+newGlobalBits);
+				}
+			}
+			localDepth++;
+			for (BucketContents contents : oldContents) {
+				insert(contents.val, new RID(contents.block, contents.id));
+			}
+		} else {
+			increaseGlobalDepth();
+			increaseLocalDepth();
+		}
+
+	}
+
+	private class BucketContents {
+		public int block;
+		public int id;
+		public Constant val;
+
+		public BucketContents(int block, int id, Constant val) {
+			this.block = block;
+			this.id = id;
+			this.val = val;
 		}
 	}
 
