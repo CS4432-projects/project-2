@@ -44,7 +44,12 @@ public class ExtensibleHashIndex implements Index {
 		globalTable = new TableInfo(globalname, globalSchema());
 		globalscan = new TableScan(globalTable, tx);
 		globalscan.beforeFirst();
-		if(!globalscan.getString("id").equals("global")) {
+		globalscan.next();
+		try {
+			if (globalscan.getString("id").equals("global")) {
+				globalDepth = globalscan.getInt("depth");
+			}
+		} catch(IllegalArgumentException e) {
 			globalscan.insert();
 			globalscan.setString("id", "global");
 			globalscan.setInt("depth", 1);
@@ -60,8 +65,6 @@ public class ExtensibleHashIndex implements Index {
 			globalscan.setString("filename", "exh"+idxname+"1");
 
 			globalDepth = 1;
-		} else {
-			globalDepth = globalscan.getInt("depth");
 		}
 	}
 
@@ -77,8 +80,9 @@ public class ExtensibleHashIndex implements Index {
 	public void beforeFirst(Constant searchkey) {
 		close();
 		String binaryHashCode = Integer.toBinaryString(searchkey.hashCode());
+		binaryHashCode = String.format("%32s", binaryHashCode).replace(' ', '0'); // pad binary with zeros
+		System.out.println("BinaryHashCode = :" + binaryHashCode);
 		bucketID = binaryHashCode.substring(binaryHashCode.length() - globalDepth);
-		// actually open the correct bucket for the given searchkey
 		globalscan = new TableScan(globalTable, tx);
 		globalscan.beforeFirst();
 		String bucketFile = "";
@@ -153,12 +157,18 @@ public class ExtensibleHashIndex implements Index {
 			// just increase the localDepth
 			globalscan = new TableScan(globalTable, tx);
 			globalscan.beforeFirst();
+			globalscan.next(); // skip the first entry that holds the globaldepth
 			while(globalscan.next()) {
 				String binaryHashCode = Integer.toBinaryString(searchkey.hashCode());
+				binaryHashCode = String.format("%32s", binaryHashCode).replace(' ', '0'); // pad binary with zeros
 				String localBits = binaryHashCode.substring(binaryHashCode.length() - localDepth);
 				String globalid = globalscan.getString("id");
+
 				if (globalid.endsWith(localBits)) {
 					globalscan.setInt("depth", localDepth + 1);
+					System.out.println("The global id is :" + globalid);
+					System.out.println("THe global depth is :" + globalDepth);
+					System.out.println("The localdepth is :" + localDepth);
 					String newGlobalBits = globalid.substring(globalid.length() - (localDepth + 1));
 					globalscan.setString("filename", "exh"+idxname+newGlobalBits);
 				}
@@ -190,6 +200,7 @@ public class ExtensibleHashIndex implements Index {
 		globalscan = new TableScan(globalTable, tx);
 		TableScan newGlobalTable = new TableScan(new TableInfo(idxname+"globalnew", globalSchema()), tx);
 		newGlobalTable.beforeFirst();
+		newGlobalTable.insert();
 		newGlobalTable.setString("id", "global");
 		newGlobalTable.setInt("depth", ++globalDepth);
 
@@ -212,6 +223,9 @@ public class ExtensibleHashIndex implements Index {
 		}
 
 		globalscan.beforeFirst();
+		while(globalscan.next()) {
+			globalscan.delete();
+		}
 		newGlobalTable.beforeFirst();
 		while(newGlobalTable.next()) {
 			String id = newGlobalTable.getString("id");
@@ -223,6 +237,7 @@ public class ExtensibleHashIndex implements Index {
 			globalscan.setInt("depth", depth);
 		}
 
+		newGlobalTable.beforeFirst();
 		while(newGlobalTable.next()) {
 			newGlobalTable.delete();
 		}
