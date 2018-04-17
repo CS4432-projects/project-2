@@ -40,12 +40,13 @@ public class IndexMgr {
     * @param fldname the name of the indexed field
     * @param tx the calling transaction
     */
-   public void createIndex(String idxname, String tblname, String fldname, Transaction tx) {
+   public void createIndex(String idxname, String tblname, String fldname, String idxtype, Transaction tx) {
       RecordFile rf = new RecordFile(ti, tx);
       rf.insert();
       rf.setString("indexname", idxname);
       rf.setString("tablename", tblname);
       rf.setString("fieldname", fldname);
+      rf.setString("indextype", idxtype);
       rf.close();
    }
    
@@ -63,7 +64,8 @@ public class IndexMgr {
          if (rf.getString("tablename").equals(tblname)) {
          String idxname = rf.getString("indexname");
          String fldname = rf.getString("fieldname");
-         IndexInfo ii = new IndexInfo(idxname, tblname, fldname, tx);
+         String idxtype = rf.getString("indextype");
+         IndexInfo ii = new IndexInfo(idxname, tblname, fldname, idxtype, tx);
          result.put(fldname, ii);
       }
       rf.close();
