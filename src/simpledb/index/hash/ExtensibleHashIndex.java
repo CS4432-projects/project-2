@@ -137,7 +137,6 @@ public class ExtensibleHashIndex implements Index {
 		if (numRecords >= MAX_ITEMS_BUCKET) {
 			increaseLocalDepth();
 			insert(val, rid);
-			// we need to increase the local depth and do a bunch of stuff
 		} else {
 			ts.insert();
 			ts.setInt("block", rid.blockNumber());
