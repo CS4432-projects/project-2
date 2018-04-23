@@ -36,12 +36,26 @@ public class SortPlan implements Plan {
     * @see simpledb.query.Plan#open()
     */
    public Scan open() {
-      Scan src = p.open();
-      List<TempTable> runs = splitIntoRuns(src);
-      src.close();
-      while (runs.size() > 2)
-         runs = doAMergeIteration(runs);
+      boolean tableSorted = false;
+      if (p instanceof TablePlan) {
+         tableSorted = ((TablePlan) p).TableInfo().isSorted();
+      }
+      List<TempTable> runs = null;
+
+      if (!tableSorted) {
+         Scan src = p.open();
+         runs = splitIntoRuns(src);
+         src.close();
+         while (runs.size() > 2)
+            runs = doAMergeIteration(runs);
+      } else {
+         TempTable temptbl = new TempTable(sch, tx);
+
+         Scan src = p.open();
+         src.beforeFirst();
+      }
       return new SortScan(runs, comp);
+
    }
    
    /**

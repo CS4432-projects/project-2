@@ -1,5 +1,6 @@
 package simpledb.opt;
 
+import simpledb.materialize.MergeJoinPlan;
 import simpledb.tx.Transaction;
 import simpledb.query.*;
 import simpledb.opt.TablePlanner;

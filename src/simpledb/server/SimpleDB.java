@@ -2,6 +2,7 @@ package simpledb.server;
 
 import simpledb.file.FileMgr;
 import simpledb.buffer.*;
+import simpledb.opt.ExplotSortQueryPlanner;
 import simpledb.tx.Transaction;
 import simpledb.log.LogMgr;
 import simpledb.metadata.MetadataMgr;
@@ -100,7 +101,7 @@ public class SimpleDB {
     * To change how the planner works, modify this method.
     * @return the system's planner for SQL commands
     */public static Planner planner() {
-      QueryPlanner  qplanner = new BasicQueryPlanner();
+      QueryPlanner  qplanner = new ExplotSortQueryPlanner();
       UpdatePlanner uplanner = new IndexUpdatePlanner();
       return new Planner(qplanner, uplanner);
    }

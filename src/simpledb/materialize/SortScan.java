@@ -66,7 +66,7 @@ public class SortScan implements Scan {
          else if (currentscan == s2)
             hasmore2 = s2.next();
       }
-      
+
       if (!hasmore1 && !hasmore2)
          return false;
       else if (hasmore1 && hasmore2) {

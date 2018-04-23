@@ -12,6 +12,10 @@ public class TablePlan implements Plan {
    private Transaction tx;
    private TableInfo ti;
    private StatInfo si;
+
+   public TableInfo TableInfo() {
+      return this.ti;
+   }
    
    /**
     * Creates a leaf node in the query tree corresponding

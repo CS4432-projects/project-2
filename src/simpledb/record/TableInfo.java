@@ -13,7 +13,15 @@ public class TableInfo {
    private Map<String,Integer> offsets;
    private int recordlen;
    private String tblname;
-   
+   private boolean tblsorted = false;
+
+   public boolean isSorted() {
+      return tblsorted;
+   }
+
+   public void setSorted(boolean sort) {
+      this.tblsorted = sort;
+   }
    /**
     * Creates a TableInfo object, given a table name
     * and schema. The constructor calculates the
