@@ -2,6 +2,10 @@ package simpledb.materialize;
 
 import simpledb.record.RID;
 import simpledb.query.*;
+import simpledb.record.TableInfo;
+import simpledb.server.SimpleDB;
+import simpledb.tx.Transaction;
+
 import java.util.*;
 
 /**
@@ -17,6 +21,9 @@ public class SortScan implements Scan {
    private RecordComparator comp;
    private boolean hasmore1, hasmore2=false;
    private List<RID> savedposition;
+   private UpdateScan table;
+   private TableInfo tblinfo;
+   private Transaction tx;
    
    /**
     * Creates a sort scan, given a list of 1 or 2 runs.
@@ -25,7 +32,7 @@ public class SortScan implements Scan {
     * @param runs the list of runs
     * @param comp the record comparator
     */
-   public SortScan(List<TempTable> runs, RecordComparator comp) {
+   public SortScan(List<TempTable> runs, RecordComparator comp, TablePlan tp, Transaction tx) {
       this.comp = comp;
       s1 = (UpdateScan) runs.get(0).open();
       hasmore1 = s1.next();
@@ -33,6 +40,9 @@ public class SortScan implements Scan {
          s2 = (UpdateScan) runs.get(1).open();
          hasmore2 = s2.next();
       }
+      table = (UpdateScan) tp.open();
+      tblinfo = tp.TableInfo();
+      this.tx = tx;
    }
    
    /**
@@ -43,12 +53,16 @@ public class SortScan implements Scan {
     * @see simpledb.query.Scan#beforeFirst()
     */
    public void beforeFirst() {
-      currentscan = null;
-      s1.beforeFirst();
-      hasmore1 = s1.next();
-      if (s2 != null) {
-         s2.beforeFirst();
-         hasmore2 = s2.next();
+      if (!this.tblinfo.isSorted()) {
+         currentscan = null;
+         s1.beforeFirst();
+         hasmore1 = s1.next();
+         if (s2 != null) {
+            s2.beforeFirst();
+            hasmore2 = s2.next();
+         }
+      } else {
+         table.beforeFirst();
       }
    }
    
@@ -60,6 +74,32 @@ public class SortScan implements Scan {
     * @see simpledb.query.Scan#next()
     */
    public boolean next() {
+      boolean tableNext = table.next();
+
+      if (this.tblinfo.isSorted()) {
+         return tableNext;
+      } else {
+         boolean sortedNext = sortedNext();
+
+         if (sortedNext) {
+            if (!tableNext) {
+               this.table.insert();
+            }
+            for (String field : this.tblinfo.schema().fields()) {
+               this.table.setVal(field, getVal(field));
+            }
+         } else {
+            tblinfo.setSorted(true);
+            SimpleDB.mdMgr().setSorted(tblinfo, tx);
+         }
+         return sortedNext;
+      }
+   }
+
+   /**
+    *
+    */
+   private boolean sortedNext() {
       if (currentscan != null) {
          if (currentscan == s1)
             hasmore1 = s1.next();
@@ -81,7 +121,7 @@ public class SortScan implements Scan {
          currentscan = s2;
       return true;
    }
-   
+
    /**
     * Closes the two underlying scans.
     * @see simpledb.query.Scan#close()
@@ -90,6 +130,7 @@ public class SortScan implements Scan {
       s1.close();
       if (s2 != null)
          s2.close();
+      table.close();
    }
    
    /**
@@ -98,7 +139,11 @@ public class SortScan implements Scan {
     * @see simpledb.query.Scan#getVal(java.lang.String)
     */
    public Constant getVal(String fldname) {
-      return currentscan.getVal(fldname);
+      if (tblinfo.isSorted()) {
+         return table.getVal(fldname);
+      } else {
+         return currentscan.getVal(fldname);
+      }
    }
    
    /**
@@ -107,7 +152,11 @@ public class SortScan implements Scan {
     * @see simpledb.query.Scan#getInt(java.lang.String)
     */
    public int getInt(String fldname) {
-      return currentscan.getInt(fldname);
+      if (tblinfo.isSorted()) {
+         return table.getInt(fldname);
+      } else {
+         return currentscan.getInt(fldname);
+      }
    }
    
    /**
@@ -116,7 +165,11 @@ public class SortScan implements Scan {
     * @see simpledb.query.Scan#getString(java.lang.String)
     */
    public String getString(String fldname) {
-      return currentscan.getString(fldname);
+      if (tblinfo.isSorted()) {
+         return table.getString(fldname);
+      } else {
+         return currentscan.getString(fldname);
+      }
    }
    
    /**
@@ -124,7 +177,11 @@ public class SortScan implements Scan {
     * @see simpledb.query.Scan#hasField(java.lang.String)
     */
    public boolean hasField(String fldname) {
-      return currentscan.hasField(fldname);
+      if (tblinfo.isSorted()) {
+         return table.hasField(fldname);
+      } else {
+         return currentscan.hasField(fldname);
+      }
    }
    
    /**
@@ -132,19 +189,23 @@ public class SortScan implements Scan {
     * so that it can be restored at a later time.
     */
    public void savePosition() {
-      RID rid1 = s1.getRid();
-      RID rid2 = (s2 == null) ? null : s2.getRid();
-      savedposition = Arrays.asList(rid1,rid2);
+      if (!tblinfo.isSorted()) {
+         RID rid1 = s1.getRid();
+         RID rid2 = (s2 == null) ? null : s2.getRid();
+         savedposition = Arrays.asList(rid1,rid2);
+      }
    }
    
    /**
     * Moves the scan to its previously-saved position.
     */
    public void restorePosition() {
-      RID rid1 = savedposition.get(0);
-      RID rid2 = savedposition.get(1);
-      s1.moveToRid(rid1);
-      if (rid2 != null)
-         s2.moveToRid(rid2);
+      if (!tblinfo.isSorted()) {
+         RID rid1 = savedposition.get(0);
+         RID rid2 = savedposition.get(1);
+         s1.moveToRid(rid1);
+         if (rid2 != null)
+            s2.moveToRid(rid2);
+      }
    }
 }

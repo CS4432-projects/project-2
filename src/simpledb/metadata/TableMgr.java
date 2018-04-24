@@ -33,6 +33,7 @@ public class TableMgr {
       Schema tcatSchema = new Schema();
       tcatSchema.addStringField("tblname", MAX_NAME);
       tcatSchema.addIntField("reclength");
+      tcatSchema.addIntField("sorted");
       tcatInfo = new TableInfo("tblcat", tcatSchema);
       
       Schema fcatSchema = new Schema();
@@ -62,6 +63,7 @@ public class TableMgr {
       tcatfile.insert();
       tcatfile.setString("tblname", tblname);
       tcatfile.setInt("reclength", ti.recordLength());
+      tcatfile.setInt("sorted", 0);
       tcatfile.close();
       
       // insert a record into fldcat for each field
@@ -87,9 +89,11 @@ public class TableMgr {
    public TableInfo getTableInfo(String tblname, Transaction tx) {
       RecordFile tcatfile = new RecordFile(tcatInfo, tx);
       int reclen = -1;
+      int isSorted = 0;
       while (tcatfile.next())
          if(tcatfile.getString("tblname").equals(tblname)) {
          reclen = tcatfile.getInt("reclength");
+         isSorted = tcatfile.getInt("sorted");
          break;
       }
       tcatfile.close();
@@ -97,6 +101,7 @@ public class TableMgr {
       RecordFile fcatfile = new RecordFile(fcatInfo, tx);
       Schema sch = new Schema();
       Map<String,Integer> offsets = new HashMap<String,Integer>();
+
       while (fcatfile.next())
          if (fcatfile.getString("tblname").equals(tblname)) {
          String fldname = fcatfile.getString("fldname");
@@ -107,6 +112,31 @@ public class TableMgr {
          sch.addField(fldname, fldtype, fldlen);
       }
       fcatfile.close();
-      return new TableInfo(tblname, sch, offsets, reclen);
+
+      TableInfo ti = new TableInfo(tblname, sch, offsets, reclen);
+      ti.setSorted(false);
+      if (isSorted == 1) {
+         ti.setSorted(true);
+      }
+
+      return ti;
+   }
+
+   /**
+    *
+    */
+   public void setSortedInfo(TableInfo ti, Transaction tx) {
+      RecordFile tcatfile = new RecordFile(tcatInfo, tx);
+
+      while (tcatfile.next()) {
+         int isSorted = 0;
+         if (ti.isSorted()) {
+            isSorted = 1;
+         }
+         if (tcatfile.getString("tblname").equals(ti.getTableName())) {
+            tcatfile.setInt("sorted", isSorted);
+         }
+      }
+      tcatfile.close();
    }
 }

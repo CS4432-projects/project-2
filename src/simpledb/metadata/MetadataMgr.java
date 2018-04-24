@@ -44,4 +44,8 @@ public class MetadataMgr {
    public StatInfo getStatInfo(String tblname, TableInfo ti, Transaction tx) {
       return statmgr.getStatInfo(tblname, ti, tx);
    }
+
+   public void setSorted(TableInfo ti, Transaction tx) {
+      tblmgr.setSortedInfo(ti, tx);
+   }
 }

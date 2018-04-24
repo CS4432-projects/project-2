@@ -101,4 +101,11 @@ public class TableInfo {
       else
          return STR_SIZE(schema.length(fldname));
    }
+
+   /**
+    *
+    */
+   public String getTableName() {
+      return this.tblname;
+   }
 }
