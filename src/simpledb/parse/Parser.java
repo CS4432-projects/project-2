@@ -234,6 +234,7 @@ public class Parser {
    public CreateIndexData createIndex() {
       String idxtype = lex.eatId();
       lex.eatKeyword("index");
+      //CS4432-Project2: add the index type
       String idxname = lex.eatId();
       lex.eatKeyword("on");
       String tblname = lex.eatId();

@@ -140,6 +140,7 @@ public class SortScan implements Scan {
     */
    public Constant getVal(String fldname) {
       if (tblinfo.isSorted()) {
+         table.next();
          return table.getVal(fldname);
       } else {
          return currentscan.getVal(fldname);

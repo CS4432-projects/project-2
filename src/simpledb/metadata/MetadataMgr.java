@@ -34,6 +34,7 @@ public class MetadataMgr {
    }
    
    public void createIndex(String idxname, String tblname, String fldname, String idxtype, Transaction tx) {
+      //CS4432-Project2: add the index type
       idxmgr.createIndex(idxname, tblname, fldname, idxtype, tx);
    }
 

@@ -17,7 +17,7 @@ import java.util.ArrayList;
  * @author Edward Sciore
  */
 public class ExtensibleHashIndex implements Index {
-	public static int MAX_ITEMS_BUCKET = 5;
+	public static int MAX_ITEMS_BUCKET = 5; // //CS4432-Project2: the max items in an extensible hash bucket
 	private String idxname;
 	private Schema sch;
 	private Transaction tx;
@@ -39,7 +39,7 @@ public class ExtensibleHashIndex implements Index {
 		this.idxname = idxname;
 		this.sch = sch;
 		this.tx = tx;
-
+		//CS4432-Project2: the global table for this index
 		String globalname = idxname + "global";
 		globalTable = new TableInfo(globalname, globalSchema());
 		globalscan = new TableScan(globalTable, tx);
@@ -50,6 +50,7 @@ public class ExtensibleHashIndex implements Index {
 				globalDepth = globalscan.getInt("depth");
 			}
 		} catch(IllegalArgumentException e) {
+			//CS4432-Project2: the first time we have created the global index, depth = 1
 			globalscan.insert();
 			globalscan.setString("id", "global");
 			globalscan.setInt("depth", 1);
@@ -82,10 +83,12 @@ public class ExtensibleHashIndex implements Index {
 		String binaryHashCode = Integer.toBinaryString(searchkey.hashCode());
 		binaryHashCode = String.format("%32s", binaryHashCode).replace(' ', '0'); // pad binary with zeros
 		System.out.println("BinaryHashCode = :" + binaryHashCode);
+		//CS4432-Project2: calculate the bucket id using the globalDepth
 		bucketID = binaryHashCode.substring(binaryHashCode.length() - globalDepth);
 		globalscan = new TableScan(globalTable, tx);
 		globalscan.beforeFirst();
 		String bucketFile = "";
+		//CS4432-Project2: Search for the bucket id in the global table
 		while(globalscan.next()) {
 			if (globalscan.getString("id").equals(bucketID)) {
 				bucketFile = globalscan.getString("filename");
@@ -131,9 +134,11 @@ public class ExtensibleHashIndex implements Index {
 		beforeFirst(val);
 		ts.beforeFirst();
 		int numRecords = 0;
+		//CS4432-Project2: count the records in the bucket
 		while(ts.next()) {
 			numRecords++;
 		}
+		//CS4432-Project2: increase the localDepth if necessary
 		if (numRecords >= MAX_ITEMS_BUCKET) {
 			increaseLocalDepth();
 			insert(val, rid);
@@ -148,10 +153,12 @@ public class ExtensibleHashIndex implements Index {
 	private void increaseLocalDepth() {
 		ArrayList<BucketContents> oldContents = new ArrayList<>();
 		ts.beforeFirst();
+		//CS4432-Project2: Save the old contents
 		while(ts.next()) {
 			oldContents.add(new BucketContents(ts.getInt("block"), ts.getInt("id"), ts.getVal("dataval")));
 		}
 
+		// check if we need to increase the globalDepth
 		if (localDepth + 1 <= globalDepth) {
 			// just increase the localDepth
 			globalscan = new TableScan(globalTable, tx);
@@ -183,6 +190,7 @@ public class ExtensibleHashIndex implements Index {
 
 	}
 
+	//CS4432-Project2: data class for storing bucket info
 	private class BucketContents {
 		public int block;
 		public int id;
@@ -196,6 +204,9 @@ public class ExtensibleHashIndex implements Index {
 	}
 
 	private void increaseGlobalDepth() {
+		//CS4432-Project2: this copies all of the old data into a temporary file and then increases the values.
+		// It then deletes everything in the old global table and copies the new values back.
+
 		globalscan = new TableScan(globalTable, tx);
 		TableScan newGlobalTable = new TableScan(new TableInfo(idxname+"globalnew", globalSchema()), tx);
 		newGlobalTable.beforeFirst();
@@ -274,6 +285,7 @@ public class ExtensibleHashIndex implements Index {
 
 
 	private Schema globalSchema() {
+		//CS4432-Project2: the schema used for the global table
 		Schema sch = new Schema();
 		sch.addStringField("id", 20);
 		sch.addStringField("filename", 40);

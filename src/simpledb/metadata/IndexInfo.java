@@ -21,6 +21,7 @@ import simpledb.index.btree.BTreeIndex; //in case we change to btree indexing
  * @author Edward Sciore
  */
 public class IndexInfo {
+   //CS4432-Project2: add the index type
    private String idxname, fldname, idxtype;
    private Transaction tx;
    private TableInfo ti;
@@ -48,6 +49,7 @@ public class IndexInfo {
     * @return the Index object associated with this information
     */
    public Index open() {
+      //CS4432-Project2: determine the type of index required
       Schema sch = schema();
       if (idxtype.equals("bt")) {
          return new BTreeIndex(idxname, sch, tx);

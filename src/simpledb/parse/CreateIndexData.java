@@ -10,6 +10,7 @@ public class CreateIndexData {
    /**
     * Saves the table and field names of the specified index.
     */
+   //CS4432-Project2: add the index type
    public CreateIndexData(String idxname, String tblname, String fldname, String idxtype) {
       this.idxname = idxname;
       this.tblname = tblname;
@@ -45,6 +46,7 @@ public class CreateIndexData {
     * Returns the type of index.
     * @return the type of index
     */
+   //CS4432-Project2: add the index type getter
    public String indexType() {
       return idxtype;
    }
