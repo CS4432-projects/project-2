@@ -55,6 +55,8 @@ public class TableMgr {
     * @param tblname the name of the new table
     * @param sch the table's schema
     * @param tx the transaction creating the table
+    *
+    * CS4432-Project 2: Modified method to account for new tblsorted value.
     */
    public void createTable(String tblname, Schema sch, Transaction tx) {
       TableInfo ti = new TableInfo(tblname, sch);
@@ -85,6 +87,8 @@ public class TableMgr {
     * @param tblname the name of the table
     * @param tx the transaction
     * @return the table's stored metadata
+    *
+    * CS4432-Project2: Modified method to account for new tblsorted value.
     */
    public TableInfo getTableInfo(String tblname, Transaction tx) {
       RecordFile tcatfile = new RecordFile(tcatInfo, tx);
@@ -123,7 +127,7 @@ public class TableMgr {
    }
 
    /**
-    *
+    * CS4432-Project 2: Added method to set sorted attributes - called by MetadataMgr.
     */
    public void setSortedInfo(TableInfo ti, Transaction tx) {
       RecordFile tcatfile = new RecordFile(tcatInfo, tx);

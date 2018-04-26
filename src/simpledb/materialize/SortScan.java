@@ -72,6 +72,8 @@ public class SortScan implements Scan {
     * Then the lowest record of the two scans is found, and that
     * scan is chosen to be the new current scan.
     * @see simpledb.query.Scan#next()
+    *
+    * CS4432: Modified this method to ensure the base table is sorted and that the metadata reflects this.
     */
    public boolean next() {
       boolean tableNext = table.next();
@@ -97,7 +99,7 @@ public class SortScan implements Scan {
    }
 
    /**
-    *
+    * CS4432: The original code for the next() method, which we transferred to a helper method for readability.
     */
    private boolean sortedNext() {
       if (currentscan != null) {

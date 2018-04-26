@@ -46,6 +46,10 @@ public class MetadataMgr {
       return statmgr.getStatInfo(tblname, ti, tx);
    }
 
+   /**
+    *
+    * CS4432-Project2: Called by SortScan, sets sorted attribute in the case that a table is sorted.
+    */
    public void setSorted(TableInfo ti, Transaction tx) {
       tblmgr.setSortedInfo(ti, tx);
    }
