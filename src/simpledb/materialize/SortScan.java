@@ -73,7 +73,7 @@ public class SortScan implements Scan {
     * scan is chosen to be the new current scan.
     * @see simpledb.query.Scan#next()
     *
-    * CS4432: Modified this method to ensure the base table is sorted and that the metadata reflects this.
+    * CS4432: Modified this method to add functionality to sort the base table and to reflect this in the metadata.
     */
    public boolean next() {
       boolean tableNext = table.next();
@@ -90,7 +90,7 @@ public class SortScan implements Scan {
             for (String field : this.tblinfo.schema().fields()) {
                this.table.setVal(field, getVal(field));
             }
-         } else {
+         } else { // we know the table is sorted
             tblinfo.setSorted(true);
             SimpleDB.mdMgr().setSorted(tblinfo, tx);
          }

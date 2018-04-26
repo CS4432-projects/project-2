@@ -1,4 +1,7 @@
-/simpledb/hash/ExtensibleHashIndex.java
+CS4432-Project 2
+Joe Bremner & Kevin O'Brien
+
+Extensible Hash Index: /simpledb/hash/ExtensibleHashIndex.java
 
 We created a globaltable that stores information about all of the buckets. This includes each bucket's file location
 (essentially a pointer) and each buckets local depth. For testing purposes the size of each bucket is 5 elements.
@@ -9,3 +12,8 @@ the bucket. It then increases the localdepth if necessary. It checks the global 
 The ExtensibleHashIndex was tested using studentClient/simpledb/CreateTestTables.java. This created several test tables
 that use various indexes. The program outputs the buckets and notes when it is increasing the local and global depth.
 It was confirmed that these were increased when the buckets filled.
+
+
+Sort-Merge-Join: /simpledb/opt/ExploitSortQueryPlanner.java
+
+We modified SortScan so that the next() function saves
