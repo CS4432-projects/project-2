@@ -1,5 +1,9 @@
-CS4432-Project 2
-Joe Bremner & Kevin O'Brien
+CS4432-Project 2 Report File
+Joseph Bremner & Kevin O'Brien
+
+
+Installation instructions: Run /simpledb/server/Startup.java.
+
 
 Extensible Hash Index: /simpledb/hash/ExtensibleHashIndex.java
 
@@ -16,4 +20,14 @@ It was confirmed that these were increased when the buckets filled.
 
 Sort-Merge-Join: /simpledb/opt/ExploitSortQueryPlanner.java
 
-We modified SortScan so that the next() function saves
+We modified SortScan so that the once the scan is complete, the next() function specifies that the table is sorted by
+setting a new attribute in the TableInfo class, and updates the base table to the sorted table. We also modified the
+other methods in the SortScan class to behave differently depending on whether the table has been sorted or not.
+
+We also modified the methods of the TableMgr and the MetadataMgr classes to account for the new sorted flag, and added
+functionality in the TableScan class to ensure that the sorted flag is set back to false if an UpdateScan is performed.
+
+Lastly, we created an ExploitSortQueryPlan class to initialize a Merge Join plan. Unfortunately, we ran into technical
+issues at the last minute that were present on one of our computers, that did not allow us to successfully test our
+updated Sort-Merge-Join mechanism as we would have liked. However, we have documented our logic and believe that it is
+sound.

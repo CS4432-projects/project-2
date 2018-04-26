@@ -1,4 +1,4 @@
-* Information about our solution to the project can be found in /README.txt. *
+* Information about our solution to the project can be found in /DESIGN.txt. *
 
                       THE SIMPLEDB DATABASE SYSTEM
                   General Information and Instructions

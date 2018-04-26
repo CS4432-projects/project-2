@@ -74,6 +74,7 @@ public class SortScan implements Scan {
     * @see simpledb.query.Scan#next()
     *
     * CS4432: Modified this method to add functionality to sort the base table and to reflect this in the metadata.
+    * By the end of the scan, the table will be in sorted order.
     */
    public boolean next() {
       boolean tableNext = table.next();
@@ -139,6 +140,8 @@ public class SortScan implements Scan {
     * Gets the Constant value of the specified field
     * of the current scan.
     * @see simpledb.query.Scan#getVal(java.lang.String)
+    *
+    * CS4432: Modified to account for the case that the table has been sorted.
     */
    public Constant getVal(String fldname) {
       if (tblinfo.isSorted()) {
@@ -153,6 +156,8 @@ public class SortScan implements Scan {
     * Gets the integer value of the specified field
     * of the current scan.
     * @see simpledb.query.Scan#getInt(java.lang.String)
+    *
+    * CS4432: Modified to account for the case that the table has been sorted.
     */
    public int getInt(String fldname) {
       if (tblinfo.isSorted()) {
@@ -166,6 +171,8 @@ public class SortScan implements Scan {
     * Gets the string value of the specified field
     * of the current scan.
     * @see simpledb.query.Scan#getString(java.lang.String)
+    *
+    * CS4432: Modified to account for the case that the table has been sorted.
     */
    public String getString(String fldname) {
       if (tblinfo.isSorted()) {
@@ -178,6 +185,8 @@ public class SortScan implements Scan {
    /**
     * Returns true if the specified field is in the current scan.
     * @see simpledb.query.Scan#hasField(java.lang.String)
+    *
+    * CS4432: Modified to account for the case that the table has been sorted.
     */
    public boolean hasField(String fldname) {
       if (tblinfo.isSorted()) {
@@ -190,6 +199,8 @@ public class SortScan implements Scan {
    /**
     * Saves the position of the current record,
     * so that it can be restored at a later time.
+    *
+    * CS4432: Modified to account for the case that the table has not been sorted.
     */
    public void savePosition() {
       if (!tblinfo.isSorted()) {
@@ -201,6 +212,8 @@ public class SortScan implements Scan {
    
    /**
     * Moves the scan to its previously-saved position.
+    *
+    * CS4432: Modified to account for the case that the table has not been sorted.
     */
    public void restorePosition() {
       if (!tblinfo.isSorted()) {

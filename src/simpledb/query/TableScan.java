@@ -21,10 +21,14 @@ public class TableScan implements UpdateScan {
     * and opens its corresponding record file. 
     * @param ti the table's metadata
     * @param tx the calling transaction
+    *
+    * CS4432-Project2: Modified constructor to reset sorted flag to false, in case data is updated.
     */
    public TableScan(TableInfo ti, Transaction tx) {
       rf  = new RecordFile(ti, tx);
       sch = ti.schema();
+
+      ti.setSorted(false);
    }
    
    // Scan methods
